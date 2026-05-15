@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640" viewBox="0 0 900 640">
+  <rect width="900" height="640" fill="#eef7f2"/>
+  <rect x="80" y="70" width="740" height="500" rx="20" fill="#ffffff" stroke="#cfe5d8"/>
+  <rect x="80" y="70" width="740" height="78" rx="20" fill="#14935f"/>
+  <text x="120" y="120" font-family="Arial" font-size="30" font-weight="700" fill="#fff">Finance Dashboard</text>
+  <rect x="120" y="190" width="190" height="110" rx="12" fill="#e9fff4"/>
+  <rect x="350" y="190" width="190" height="110" rx="12" fill="#e9fff4"/>
+  <rect x="580" y="190" width="190" height="110" rx="12" fill="#e9fff4"/>
+  <polyline points="140,470 230,390 320,430 420,310 520,360 610,245 750,300" fill="none" stroke="#14935f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="610" cy="245" r="18" fill="#ffcc33"/>
+  <text x="145" y="258" font-family="Arial" font-size="42" font-weight="700" fill="#14935f">$</text>
+  <text x="375" y="258" font-family="Arial" font-size="42" font-weight="700" fill="#14935f">%</text>
+  <text x="605" y="258" font-family="Arial" font-size="42" font-weight="700" fill="#14935f">AI</text>
+</svg>

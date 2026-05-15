@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="640" viewBox="0 0 900 640">
+  <rect width="900" height="640" fill="#f4f7fb"/>
+  <rect x="70" y="70" width="760" height="500" rx="18" fill="#ffffff" stroke="#d8e1ee"/>
+  <rect x="70" y="70" width="760" height="70" rx="18" fill="#1f73d8"/>
+  <text x="105" y="115" font-family="Arial" font-size="28" font-weight="700" fill="#fff">Laptop Store ASP.NET</text>
+  <rect x="105" y="175" width="260" height="320" rx="12" fill="#eef4ff"/>
+  <rect x="395" y="175" width="170" height="135" rx="10" fill="#fff" stroke="#d8e1ee"/>
+  <rect x="595" y="175" width="170" height="135" rx="10" fill="#fff" stroke="#d8e1ee"/>
+  <rect x="395" y="350" width="170" height="135" rx="10" fill="#fff" stroke="#d8e1ee"/>
+  <rect x="595" y="350" width="170" height="135" rx="10" fill="#fff" stroke="#d8e1ee"/>
+  <rect x="150" y="250" width="170" height="110" rx="8" fill="#2c3e50"/>
+  <rect x="170" y="365" width="130" height="12" rx="6" fill="#2c3e50"/>
+  <circle cx="480" cy="235" r="42" fill="#68a6ff"/>
+  <circle cx="680" cy="235" r="42" fill="#68a6ff"/>
+  <circle cx="480" cy="410" r="42" fill="#68a6ff"/>
+  <circle cx="680" cy="410" r="42" fill="#68a6ff"/>
+  <text x="405" y="545" font-family="Arial" font-size="30" font-weight="700" fill="#e53935">200.000 VND</text>
+</svg>
