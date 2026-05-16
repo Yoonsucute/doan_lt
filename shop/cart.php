@@ -13,20 +13,20 @@ if ($cart) {
     );
 }
 
-$pageTitle = 'Gio hang';
+$pageTitle = 'Giỏ hàng';
 ?>
 <?php include dirname(__DIR__) . '/includes/header.php'; ?>
 <?php include dirname(__DIR__) . '/includes/navbar.php'; ?>
 
 <main class="container py-5">
     <div class="shop-page-head mb-4">
-        <h1>Gio hang</h1>
+        <h1>Giỏ hàng</h1>
         <p>Kiem tra source code truoc khi tao don hang.</p>
     </div>
 
     <?php if (!$items) { ?>
         <div class="shop-empty">
-            Gio hang dang trong. <a href="<?php echo e(base_url('index.php')); ?>">Quay lai cua hang</a>
+            Giỏ hàng dang trong. <a href="<?php echo e(base_url('index.php')); ?>">Quay lai cua hang</a>
         </div>
     <?php } else { ?>
         <form method="POST" action="<?php echo e(base_url('shop/cart_action.php')); ?>" class="card p-3">
@@ -36,7 +36,7 @@ $pageTitle = 'Gio hang';
                 <table class="table align-middle cart-table">
                     <tr>
                         <th>San pham</th>
-                        <th>Gia</th>
+                        <th>Giá</th>
                         <th style="width:120px;">So luong</th>
                         <th>Tam tinh</th>
                         <th></th>
@@ -61,11 +61,11 @@ $pageTitle = 'Gio hang';
                 </table>
             </div>
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                <a href="<?php echo e(base_url('shop/cart_action.php?action=clear')); ?>" class="btn btn-outline-secondary">Lam trong gio hang</a>
+                <a href="<?php echo e(base_url('shop/cart_action.php?action=clear')); ?>" class="btn btn-outline-secondary">Làm trống giỏ hàng</a>
                 <div class="d-flex flex-column flex-md-row gap-2 align-items-md-center">
-                    <strong>Tong: <?php echo money(cart_total()); ?></strong>
+                    <strong>Tổng: <?php echo money(cart_total()); ?></strong>
                     <button class="btn btn-outline-primary">Cap nhat gio</button>
-                    <a href="<?php echo e(base_url('shop/checkout.php')); ?>" class="btn btn-success">Tien hanh thanh toan</a>
+                    <a href="<?php echo e(base_url('shop/checkout.php')); ?>" class="btn btn-success">Tiến hành thanh toán</a>
                 </div>
             </div>
         </form>

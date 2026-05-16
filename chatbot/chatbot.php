@@ -3,77 +3,87 @@ include '../config.php';
 
 $message = trim($_POST['message'] ?? '');
 if ($message === '') {
-    echo 'Ban muon tim source ve chu de gi?';
-    exit;
-}
-
-function call_ai(string $message): ?string
-{
-    $openAiKey = getenv('OPENAI_API_KEY');
-    $geminiKey = getenv('GEMINI_API_KEY');
-
-    if ($openAiKey) {
-        $payload = json_encode([
-            'model' => getenv('OPENAI_MODEL') ?: 'gpt-4o-mini',
-            'messages' => [
-                ['role' => 'system', 'content' => 'Ban la chatbot tieng Viet cho website chia se source code. Tra loi ngan gon, goi y tu khoa/source phu hop.'],
-                ['role' => 'user', 'content' => $message],
-            ],
-            'temperature' => 0.4,
-        ]);
-        $ch = curl_init('https://api.openai.com/v1/chat/completions');
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $openAiKey],
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 12,
-        ]);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $data = json_decode($response ?: '', true);
-        return $data['choices'][0]['message']['content'] ?? null;
-    }
-
-    if ($geminiKey) {
-        $payload = json_encode([
-            'contents' => [[
-                'parts' => [[
-                    'text' => 'Tra loi ngan gon bang tieng Viet, goi y source code phu hop: ' . $message,
-                ]],
-            ]],
-        ]);
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . urlencode($geminiKey);
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $payload,
-            CURLOPT_TIMEOUT => 12,
-        ]);
-        $response = curl_exec($ch);
-        curl_close($ch);
-        $data = json_decode($response ?: '', true);
-        return $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
-    }
-
-    return null;
-}
-
-$ai = function_exists('curl_init') ? call_ai($message) : null;
-if ($ai) {
-    echo e(mb_substr($ai, 0, 500));
+    echo 'Bạn cần tìm source về đề tài nào? Vi du: website ban hang PHP MySQL, quan ly khach san, Java Swing...';
     exit;
 }
 
 $lower = function_exists('mb_strtolower') ? mb_strtolower($message, 'UTF-8') : strtolower($message);
-if (strpos($lower, 'php') !== false) {
-    echo 'Ban co the tim PHP, Laravel, MVC, CRUD, quan ly sinh vien hoac ban hang.';
-} elseif (strpos($lower, 'java') !== false) {
-    echo 'Thu tim Java Swing, Spring Boot, quan ly thu vien, ban hang hoac chat realtime.';
-} elseif (strpos($lower, 'python') !== false) {
-    echo 'Goi y Python: Django, Flask, AI chatbot, nhan dien anh, crawl du lieu.';
-} else {
-    echo 'Hay thu cac tu khoa nhu PHP, Laravel, Java, Python, NodeJS hoac mo ta bai toan ban dang lam.';
+
+if (str_contains($lower, 'dang source') || str_contains($lower, 'upload')) {
+    echo 'Để đăng source: đăng nhập -> bấm "Upload" -> nhập tên, mô tả, danh mục, tech stack, giá, ảnh demo và file zip/rar/7z. Source sẽ chờ admin duyệt trước khi hiển thị.';
+    exit;
 }
+
+if (str_contains($lower, 'tai source') || str_contains($lower, 'download')) {
+    echo 'Source miễn phí co the tai truc tiep. Source premium can them vao gio hang, checkout va cho admin xac nhan paid roi moi tai trong muc Đơn hàng.';
+    exit;
+}
+
+$keywords = preg_split('/\s+/u', preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $lower));
+$keywords = array_values(array_filter($keywords, fn($word) => mb_strlen($word, 'UTF-8') >= 2));
+$important = [];
+foreach ($keywords as $word) {
+    if (!in_array($word, ['toi', 'can', 'source', 'code', 'web', 'website', 'do', 'an', 'tim', 'cho', 'xin'], true)) {
+        $important[] = $word;
+    }
+}
+$important = array_slice(array_unique($important), 0, 5);
+
+$where = ["projects.status = 'approved'"];
+$params = [];
+$types = '';
+foreach ($important as $word) {
+    $like = '%' . $word . '%';
+    $where[] = "(projects.title LIKE ? OR projects.short_description LIKE ? OR projects.description LIKE ? OR projects.tech_stack LIKE ? OR categories.name LIKE ?)";
+    array_push($params, $like, $like, $like, $like, $like);
+    $types .= 'sssss';
+}
+
+if (str_contains($lower, 'mien phi') || str_contains($lower, 'free')) {
+    $where[] = "(projects.is_free = 1 OR (projects.price = 0 AND projects.sale_price = 0))";
+}
+if (str_contains($lower, 'premium') || str_contains($lower, 'tra phi')) {
+    $where[] = "(projects.price > 0 OR projects.sale_price > 0 OR projects.tier IN ('premium','exclusive'))";
+}
+
+$whereSql = implode(' AND ', $where);
+$matches = db_all(
+    "SELECT projects.id, projects.title, projects.slug, projects.price, projects.sale_price, projects.is_free, categories.name AS category_name
+     FROM projects
+     JOIN categories ON categories.id = projects.category_id
+     WHERE $whereSql
+     ORDER BY projects.is_hot DESC, projects.is_featured DESC, projects.downloads_count DESC, projects.id DESC
+     LIMIT 5",
+    $params,
+    $types
+);
+
+if (!$matches && $important) {
+    $fallback = '%' . $important[0] . '%';
+    $matches = db_all(
+        "SELECT projects.id, projects.title, projects.slug, projects.price, projects.sale_price, projects.is_free, categories.name AS category_name
+         FROM projects
+         JOIN categories ON categories.id = projects.category_id
+         WHERE projects.status = 'approved'
+           AND (projects.title LIKE ? OR categories.name LIKE ?)
+         ORDER BY projects.id DESC
+         LIMIT 5",
+        [$fallback, $fallback],
+        'ss'
+    );
+}
+
+if (!$matches) {
+    $cats = db_all('SELECT name FROM categories ORDER BY name LIMIT 8');
+    echo 'Chưa thấy source thật sự khớp. Bạn có thể thử các danh mục: ' . implode(', ', array_column($cats, 'name')) . '.';
+    exit;
+}
+
+$lines = ['Toi tim thay source phù hợp:'];
+foreach ($matches as $item) {
+    $isFree = (int) $item['is_free'] === 1 || ((int) $item['price'] === 0 && (int) $item['sale_price'] === 0);
+    $price = $isFree ? 'Miễn phí' : money(project_price($item));
+    $lines[] = '- ' . $item['title'] . ' (' . $item['category_name'] . ', ' . $price . ') - ' . base_url('projects/detail.php?id=' . (int) $item['id'] . '&slug=' . $item['slug']);
+}
+
+echo implode("\n", $lines);

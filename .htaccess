@@ -4,6 +4,32 @@ DirectoryIndex index.php
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
+RewriteRule ^login\.php$ auth/login.php [L,QSA]
+RewriteRule ^register\.php$ auth/register.php [L,QSA]
+RewriteRule ^logout\.php$ auth/logout.php [L,QSA]
+RewriteRule ^profile\.php$ auth/profile.php [L,QSA]
+
+RewriteRule ^project_detail\.php$ projects/detail.php [L,QSA]
+RewriteRule ^upload_project\.php$ projects/upload.php [L,QSA]
+RewriteRule ^edit_project\.php$ projects/edit.php [L,QSA]
+RewriteRule ^delete_project\.php$ projects/delete.php [L,QSA]
+RewriteRule ^download\.php$ projects/download.php [L,QSA]
+RewriteRule ^search\.php$ projects/search.php [L,QSA]
+RewriteRule ^category\.php$ projects/category.php [L,QSA]
+
+RewriteRule ^cart\.php$ shop/cart.php [L,QSA]
+RewriteRule ^cart_action\.php$ shop/cart_action.php [L,QSA]
+RewriteRule ^checkout\.php$ shop/checkout.php [L,QSA]
+RewriteRule ^orders\.php$ shop/orders.php [L,QSA]
+
+RewriteRule ^bookmark\.php$ actions/bookmark.php [L,QSA]
+RewriteRule ^follow\.php$ actions/follow.php [L,QSA]
+RewriteRule ^rating\.php$ actions/rating.php [L,QSA]
+RewriteRule ^save_comment\.php$ actions/save_comment.php [L,QSA]
+RewriteRule ^comment_vote\.php$ actions/comment_vote.php [L,QSA]
+RewriteRule ^report_project\.php$ actions/report_project.php [L,QSA]
+
 RewriteRule ^danh-muc/([0-9]+)/([a-zA-Z0-9-]+)/?$ projects/category.php?id=$1&slug=$2 [L,QSA]
 RewriteRule ^project/([0-9]+)/([a-zA-Z0-9-]+)/?$ projects/detail.php?id=$1&slug=$2 [L,QSA]
 </IfModule>

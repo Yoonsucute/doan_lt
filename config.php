@@ -83,7 +83,7 @@ function e($value): string
 function money($value): string
 {
     $amount = (int) $value;
-    return $amount > 0 ? number_format($amount, 0, ',', '.') . ' VND' : 'Mien phi';
+    return $amount > 0 ? number_format($amount, 0, ',', '.') . ' VND' : 'Miễn phí';
 }
 
 function discount_percent($price, $salePrice): int
@@ -154,7 +154,7 @@ function is_admin(): bool
 function require_login(): void
 {
     if (!isset($_SESSION['user'])) {
-        flash('Vui long dang nhap de tiep tuc.', 'warning');
+        flash('Vui lòng đăng nhập để tiếp tục.', 'warning');
         redirect(base_url('auth/login.php'));
     }
 }
@@ -162,7 +162,7 @@ function require_login(): void
 function require_admin(): void
 {
     if (!is_admin()) {
-        flash('Ban khong co quyen truy cap khu vuc admin.', 'danger');
+        flash('Bạn không có quyền truy cập khu vực admin.', 'danger');
         redirect('../index.php');
     }
 }
@@ -185,7 +185,7 @@ function verify_csrf(): void
     $token = $_POST['csrf_token'] ?? '';
     if (!$token || !hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
         http_response_code(419);
-        die('CSRF token khong hop le.');
+        die('CSRF token không hợp lệ.');
     }
 }
 
@@ -233,13 +233,13 @@ function safe_filename(string $original, array $allowedExt, int $maxSize, string
 {
     $ext = strtolower(pathinfo($original, PATHINFO_EXTENSION));
     if (!in_array($ext, $allowedExt, true)) {
-        throw new RuntimeException('Dinh dang file khong hop le.');
+        throw new RuntimeException('Định dạng file không hợp lệ.');
     }
     if ($size <= 0 || $size > $maxSize) {
-        throw new RuntimeException('Dung luong file vuot gioi han.');
+        throw new RuntimeException('Dung lượng file vượt giới hạn.');
     }
     if (!is_uploaded_file($tmpPath)) {
-        throw new RuntimeException('File upload khong hop le.');
+        throw new RuntimeException('File upload không hợp lệ.');
     }
     return bin2hex(random_bytes(12)) . '.' . $ext;
 }
@@ -247,6 +247,17 @@ function safe_filename(string $original, array $allowedExt, int $maxSize, string
 function ensure_schema(): void
 {
     global $conn;
+
+    $categoryColumns = [];
+    $categoryResult = mysqli_query($conn, "SHOW COLUMNS FROM categories");
+    if ($categoryResult) {
+        while ($row = mysqli_fetch_assoc($categoryResult)) {
+            $categoryColumns[$row['Field']] = true;
+        }
+    }
+    if (!isset($categoryColumns['slug'])) {
+        mysqli_query($conn, "ALTER TABLE categories ADD slug VARCHAR(120) NULL AFTER name");
+    }
 
     $columns = [];
     $result = mysqli_query($conn, "SHOW COLUMNS FROM projects");
@@ -263,12 +274,76 @@ function ensure_schema(): void
     if (!isset($columns['meta_title'])) {
         mysqli_query($conn, "ALTER TABLE projects ADD meta_title VARCHAR(255) NULL AFTER slug");
     }
+    if (!isset($columns['short_description'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD short_description VARCHAR(255) NULL AFTER meta_title");
+    }
+    if (!isset($columns['tech_stack'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD tech_stack VARCHAR(255) NULL AFTER description");
+    }
+    if (!isset($columns['version'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD version VARCHAR(50) NULL AFTER tech_stack");
+    }
+    if (!isset($columns['file_size'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD file_size VARCHAR(50) NULL AFTER version");
+    }
+    if (!isset($columns['demo_link'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD demo_link VARCHAR(255) NULL AFTER file_size");
+    }
+    if (!isset($columns['video_demo'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD video_demo VARCHAR(255) NULL AFTER demo_link");
+    }
+    if (!isset($columns['install_guide'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD install_guide TEXT NULL AFTER video_demo");
+    }
+    if (!isset($columns['main_features'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD main_features TEXT NULL AFTER install_guide");
+    }
+    if (!isset($columns['views'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD views INT DEFAULT 0 AFTER main_features");
+    }
+    if (!isset($columns['downloads_count'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD downloads_count INT DEFAULT 0 AFTER views");
+    }
     if (!isset($columns['price'])) {
         mysqli_query($conn, "ALTER TABLE projects ADD price INT DEFAULT 0 AFTER source_file");
     }
     if (!isset($columns['sale_price'])) {
         mysqli_query($conn, "ALTER TABLE projects ADD sale_price INT DEFAULT 0 AFTER price");
     }
+    if (!isset($columns['is_free'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD is_free TINYINT(1) DEFAULT 0 AFTER sale_price");
+    }
+    if (!isset($columns['tier'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD tier ENUM('basic','premium','exclusive') DEFAULT 'basic' AFTER is_free");
+    }
+    if (!isset($columns['is_featured'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD is_featured TINYINT(1) DEFAULT 0 AFTER tier");
+    }
+    if (!isset($columns['is_hot'])) {
+        mysqli_query($conn, "ALTER TABLE projects ADD is_hot TINYINT(1) DEFAULT 0 AFTER is_featured");
+    }
+    mysqli_query($conn, "ALTER TABLE projects MODIFY status ENUM('pending','approved','rejected','hidden') DEFAULT 'pending'");
+    mysqli_query($conn, "UPDATE projects SET is_free = 1 WHERE price = 0 AND sale_price = 0");
+    mysqli_query($conn, "UPDATE projects SET short_description = LEFT(description, 250) WHERE short_description IS NULL OR short_description = ''");
+    mysqli_query($conn, "UPDATE projects SET downloads_count = downloads WHERE downloads_count = 0 AND downloads > 0");
+
+    $defaultCategories = [
+        'PHP & MySQL', 'Laravel', 'Java Spring', 'Java Swing', 'Python', 'ASP.NET',
+        'ReactJS / NodeJS', 'Flutter', 'Android', 'Website ban hang',
+        'Quan ly khach san', 'Quan ly sinh vien', 'Quan ly kho', 'Quan ly nha hang',
+        'Do an tot nghiep', 'Code miễn phí', 'Code premium',
+    ];
+    foreach ($defaultCategories as $name) {
+        $slug = slugify($name);
+        db_query(
+            "INSERT INTO categories(name, slug)
+             SELECT ?, ?
+             WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = ?)",
+            [$name, $slug, $name],
+            'sss'
+        );
+    }
+    mysqli_query($conn, "UPDATE categories SET slug = LOWER(REPLACE(name, ' ', '-')) WHERE slug IS NULL OR slug = ''");
 
     $missingSlugs = mysqli_query($conn, "SELECT id, title FROM projects WHERE slug IS NULL OR slug = ''");
     if ($missingSlugs) {
@@ -332,6 +407,7 @@ function ensure_schema(): void
         status ENUM('pending','completed','cancelled') DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    mysqli_query($conn, "ALTER TABLE orders MODIFY status ENUM('pending','paid','completed','cancelled') DEFAULT 'pending'");
 
     mysqli_query($conn, "CREATE TABLE IF NOT EXISTS order_items (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -340,6 +416,23 @@ function ensure_schema(): void
         title VARCHAR(255) NOT NULL,
         price INT DEFAULT 0,
         quantity INT DEFAULT 1
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    mysqli_query($conn, "CREATE TABLE IF NOT EXISTS downloads (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT DEFAULT NULL,
+        project_id INT NOT NULL,
+        ip_address VARCHAR(45) DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    mysqli_query($conn, "CREATE TABLE IF NOT EXISTS cart (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        project_id INT NOT NULL,
+        quantity INT DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY uniq_cart_item (user_id, project_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 }
 

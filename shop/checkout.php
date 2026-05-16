@@ -4,7 +4,7 @@ require_login();
 
 $cart = cart_items();
 if (!$cart) {
-    flash('Gio hang dang trong.', 'warning');
+    flash('Giỏ hàng dang trong.', 'warning');
     redirect(base_url('shop/cart.php'));
 }
 
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $note = trim($_POST['note'] ?? '');
 
     if ($name === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        flash('Vui long nhap ten va email hop le.', 'danger');
+        flash('Vui lòng nhập tên và email hợp lệ.', 'danger');
     } else {
         $total = 0;
         foreach ($items as $item) {
@@ -49,12 +49,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $_SESSION['cart'] = [];
-        flash('Da tao don hang. Admin se xac nhan va ho tro ban tai source.');
+        flash('Đã tạo đơn hàng. Admin sẽ xác nhận và hỗ trợ bạn tải source.');
         redirect(base_url('shop/orders.php'));
     }
 }
 
-$pageTitle = 'Thanh toan';
+$pageTitle = 'Thanh toán';
 ?>
 <?php include dirname(__DIR__) . '/includes/header.php'; ?>
 <?php include dirname(__DIR__) . '/includes/navbar.php'; ?>
@@ -63,24 +63,24 @@ $pageTitle = 'Thanh toan';
     <div class="row g-4">
         <div class="col-lg-7">
             <div class="card p-4">
-                <h3 class="mb-3">Thong tin thanh toan</h3>
+                <h3 class="mb-3">Thông tin thanh toán</h3>
                 <form method="POST">
                     <?php echo csrf_field(); ?>
-                    <label class="form-label">Ho ten</label>
+                    <label class="form-label">Họ tên</label>
                     <input type="text" name="name" class="form-control mb-3" value="<?php echo e(current_user()['name']); ?>" required>
                     <label class="form-label">Email</label>
                     <input type="email" name="email" class="form-control mb-3" value="<?php echo e(current_user()['email']); ?>" required>
-                    <label class="form-label">So dien thoai</label>
+                    <label class="form-label">Số điện thoại</label>
                     <input type="text" name="phone" class="form-control mb-3">
-                    <label class="form-label">Ghi chu</label>
-                    <textarea name="note" class="form-control mb-4" rows="4" placeholder="Noi dung can ho tro, zalo, yeu cau cai dat..."></textarea>
-                    <button class="btn btn-success w-100">Dat hang</button>
+                    <label class="form-label">Ghi chú</label>
+                    <textarea name="note" class="form-control mb-4" rows="4" placeholder="Nội dung cần hỗ trợ, Zalo, yêu cầu cài đặt..."></textarea>
+                    <button class="btn btn-success w-100">Đặt hàng</button>
                 </form>
             </div>
         </div>
         <div class="col-lg-5">
             <div class="shop-sidebar">
-                <h5>Don hang cua ban</h5>
+                <h5>Đơn hàng cua ban</h5>
                 <?php foreach ($items as $item) {
                     $qty = (int) ($cart[$item['id']] ?? 1);
                     $price = project_price($item);
@@ -91,10 +91,10 @@ $pageTitle = 'Thanh toan';
                     </div>
                 <?php } ?>
                 <div class="checkout-total">
-                    <span>Tong cong</span>
+                    <span>Tổng cộng</span>
                     <strong><?php echo money(cart_total()); ?></strong>
                 </div>
-                <p class="text-muted small mt-3 mb-0">Sau khi admin xac nhan, don hang se duoc cap nhat trang thai va ban co the tai source trong lich su don hang.</p>
+                <p class="text-muted small mt-3 mb-0">Sau khi admin xác nhận, đơn hàng sẽ được cập nhật trạng thái và bạn có thể tải source trong lịch sử đơn hàng.</p>
             </div>
         </div>
     </div>

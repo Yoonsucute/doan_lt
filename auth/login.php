@@ -10,27 +10,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         session_regenerate_id(false);
         $_SESSION['user'] = $user;
-        flash('Dang nhap thanh cong.');
+        flash('Đăng nhập thành công.');
         redirect($user['role'] === 'admin' ? base_url('admin/dashboard.php') : base_url('index.php'));
     }
 
-    flash('Sai email hoac mat khau.', 'danger');
+    flash('Sai email hoặc mật khẩu.', 'danger');
 }
 
-$pageTitle = 'Dang nhap';
+$pageTitle = 'Đăng nhập';
 ?>
 <?php include dirname(__DIR__) . '/includes/header.php'; ?>
 
 <main class="container py-5">
     <div class="auth-card col-md-5 col-lg-4 mx-auto p-4">
-        <h3 class="text-center mb-4">Dang nhap</h3>
+        <h3 class="text-center mb-4">Đăng nhập</h3>
         <form method="POST">
             <?php echo csrf_field(); ?>
             <input type="email" name="email" class="form-control mb-3" placeholder="Email" required>
-            <input type="password" name="password" class="form-control mb-3" placeholder="Mat khau" required>
-            <button class="btn btn-success w-100">Dang nhap</button>
+            <input type="password" name="password" class="form-control mb-3" placeholder="Mật khẩu" required>
+            <button class="btn btn-success w-100">Đăng nhập</button>
         </form>
-        <div class="text-center mt-3">Chua co tai khoan? <a href="<?php echo e(base_url('auth/register.php')); ?>">Dang ky</a></div>
+        <div class="text-center mt-3">Chưa có tài khoản? <a href="<?php echo e(base_url('auth/register.php')); ?>">Đăng ký</a></div>
     </div>
 </main>
 

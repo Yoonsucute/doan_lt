@@ -28,14 +28,14 @@ if ($orders) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quan ly don hang</title>
+    <title>Quản lý đơn hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
 <main class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Quan ly don hang</h2>
+        <h2>Quản lý đơn hàng</h2>
         <a class="btn btn-outline-secondary" href="dashboard.php">Dashboard</a>
     </div>
 
@@ -51,18 +51,18 @@ if ($orders) {
                     <?php echo csrf_field(); ?>
                     <input type="hidden" name="id" value="<?php echo (int) $order['id']; ?>">
                     <select name="status" class="form-select form-select-sm">
-                        <?php foreach (['pending', 'completed', 'cancelled'] as $status) { ?>
+                        <?php foreach (['pending', 'paid', 'completed', 'cancelled'] as $status) { ?>
                             <option value="<?php echo $status; ?>" <?php echo $order['status'] === $status ? 'selected' : ''; ?>><?php echo $status; ?></option>
                         <?php } ?>
                     </select>
-                    <button class="btn btn-primary btn-sm">Luu</button>
+                    <button class="btn btn-primary btn-sm">Lưu</button>
                 </form>
             </div>
-            <div class="fw-bold mb-2">Tong: <?php echo money($order['total']); ?></div>
+            <div class="fw-bold mb-2">Tổng: <?php echo money($order['total']); ?></div>
             <?php if ($order['note']) { ?><div class="alert alert-light"><?php echo e($order['note']); ?></div><?php } ?>
             <div class="table-responsive">
                 <table class="table">
-                    <tr><th>Source</th><th>Gia</th><th>SL</th></tr>
+                    <tr><th>Source</th><th>Giá</th><th>SL</th></tr>
                     <?php foreach ($itemsByOrder[$order['id']] ?? [] as $item) { ?>
                         <tr>
                             <td><?php echo e($item['title']); ?></td>
@@ -75,7 +75,7 @@ if ($orders) {
         </div>
     <?php } ?>
 
-    <?php if (!$orders) { ?><div class="shop-empty">Chua co don hang nao.</div><?php } ?>
+    <?php if (!$orders) { ?><div class="shop-empty">Chưa có đơn hàng nào.</div><?php } ?>
 </main>
 </body>
 </html>

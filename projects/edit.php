@@ -5,7 +5,7 @@ require_login();
 $id = (int) ($_GET['id'] ?? 0);
 $project = db_one('SELECT * FROM projects WHERE id = ?', [$id], 'i');
 if (!$project || ((int) $project['user_id'] !== (int) current_user()['id'] && !is_admin())) {
-    flash('Khong co quyen sua do an nay.', 'danger');
+    flash('Không có quyền sửa đồ án này.', 'danger');
     redirect(base_url('auth/profile.php'));
 }
 
@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [$title, $slug, $metaTitle, $description, $categoryId, $id],
             'ssssii'
         );
-        flash('Da cap nhat do an.');
+        flash('Đã cập nhật đồ án.');
         redirect(base_url('auth/profile.php'));
     }
 }
 
 $categories = db_all('SELECT * FROM categories ORDER BY name');
-$pageTitle = 'Sua do an';
+$pageTitle = 'Sửa do an';
 ?>
 <?php include dirname(__DIR__) . '/includes/header.php'; ?>
 <?php include dirname(__DIR__) . '/includes/navbar.php'; ?>
@@ -37,16 +37,16 @@ $pageTitle = 'Sua do an';
 <main class="container py-5">
     <div class="card col-lg-8 mx-auto">
         <div class="card-body p-4">
-            <h3 class="mb-4">Chinh sua do an</h3>
+            <h3 class="mb-4">Chỉnh sửa đồ án</h3>
             <form method="POST">
                 <?php echo csrf_field(); ?>
-                <label class="form-label">Ten do an</label>
+                <label class="form-label">Tên đồ án</label>
                 <input type="text" name="title" class="form-control mb-3" value="<?php echo e($project['title']); ?>" required>
                 <label class="form-label">Meta title SEO</label>
                 <input type="text" name="meta_title" class="form-control mb-3" value="<?php echo e($project['meta_title']); ?>">
-                <label class="form-label">Mo ta</label>
+                <label class="form-label">Mô tả</label>
                 <textarea name="description" class="form-control mb-3" rows="6" required><?php echo e($project['description']); ?></textarea>
-                <label class="form-label">Danh muc</label>
+                <label class="form-label">Danh mục</label>
                 <select name="category_id" class="form-select mb-4">
                     <?php foreach ($categories as $cat) { ?>
                         <option value="<?php echo (int) $cat['id']; ?>" <?php echo (int) $cat['id'] === (int) $project['category_id'] ? 'selected' : ''; ?>>

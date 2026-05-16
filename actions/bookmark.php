@@ -9,10 +9,10 @@ $userId = (int) current_user()['id'];
 $exists = db_one('SELECT id FROM bookmarks WHERE user_id = ? AND project_id = ?', [$userId, $projectId], 'ii');
 if ($exists) {
     db_query('DELETE FROM bookmarks WHERE id = ?', [(int) $exists['id']], 'i');
-    flash('Da bo bookmark.');
+    flash('Đã bỏ bookmark.');
 } else {
     db_query('INSERT INTO bookmarks(user_id, project_id) VALUES(?, ?)', [$userId, $projectId], 'ii');
-    flash('Da bookmark do an.');
+    flash('Đã bookmark đồ án.');
 }
 
 redirect(base_url('projects/detail.php?id=' . $projectId));

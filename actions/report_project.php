@@ -12,7 +12,7 @@ if ($projectId > 0 && $reason !== '') {
         [$projectId, current_user()['id'], $reason],
         'iis'
     );
-    flash('Da gui report. Admin se kiem tra som.');
+    flash('Đã gửi báo cáo. Admin sẽ kiểm tra sớm.');
 }
 
 redirect(base_url('projects/detail.php?id=' . $projectId));

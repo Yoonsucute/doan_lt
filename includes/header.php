@@ -1,7 +1,7 @@
 <?php
-$pageTitle = $pageTitle ?? 'Share Do An';
+$pageTitle = $pageTitle ?? 'CodeDoAn';
 $metaTitle = $metaTitle ?? $pageTitle;
-$metaDescription = $metaDescription ?? 'Chia se source code va do an lap trinh.';
+$metaDescription = $metaDescription ?? 'CodeDoAn - nền tảng chia sẻ, mua bán và tải source code, đồ án lập trình.';
 ?>
 <!DOCTYPE html>
 <html lang="vi">

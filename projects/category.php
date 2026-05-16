@@ -10,7 +10,7 @@ $start = ($page - 1) * $limit;
 $category = db_one('SELECT * FROM categories WHERE id = ?', [$categoryId], 'i');
 if (!$category) {
     http_response_code(404);
-    die('Khong tim thay danh muc.');
+    die('Không tìm thấy danh mục.');
 }
 
 $orderBy = match ($sort) {
@@ -61,7 +61,7 @@ $categories = db_all(
 
 $pageTitle = $category['name'] . ' - Code do an';
 $metaTitle = $category['name'] . ' - Code do an';
-$metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, gia ban, loc va sap xep.';
+$metaDescription = 'Danh mục source code ' . $category['name'] . ' co gio hang, gia ban, loc va sap xep.';
 ?>
 <?php include dirname(__DIR__) . '/includes/header.php'; ?>
 
@@ -70,12 +70,12 @@ $metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, 
         <div class="container d-flex flex-column flex-lg-row justify-content-between gap-2">
             <div class="d-flex flex-wrap gap-4">
                 <span><i class="fa-regular fa-envelope"></i> codedoan.com@gmail.com</span>
-                <span><i class="fa-regular fa-clock"></i> Ho tro cai dat: 09h-21h</span>
+                <span><i class="fa-regular fa-clock"></i> Hỗ trợ cài đặt: 09h-21h</span>
                 <span><i class="fa-solid fa-phone"></i> 0384972984</span>
                 <a href="<?php echo e(base_url('index.php')); ?>">Blog ve lap trinh</a>
             </div>
             <a class="login-pill" href="<?php echo e(current_user() ? base_url('auth/profile.php') : base_url('auth/login.php')); ?>">
-                <?php echo current_user() ? e(current_user()['name']) : 'Dang nhap / Dang ky'; ?>
+                <?php echo current_user() ? e(current_user()['name']) : 'Đăng nhập / Đăng ký'; ?>
             </a>
         </div>
     </div>
@@ -91,7 +91,7 @@ $metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, 
                 <form action="<?php echo e(base_url('projects/search.php')); ?>" method="GET" class="codedoan-search">
                     <input type="text" name="keyword" placeholder="Nhap tu khoa can tim..." value="<?php echo e($_GET['keyword'] ?? ''); ?>">
                     <button><i class="fa-solid fa-magnifying-glass"></i></button>
-                    <div class="install-tooltip">Ho tro cai dat 09h-21h | Ho tro cai dat hoan toan mien phi</div>
+                    <div class="install-tooltip">Hỗ trợ cài đặt 09h-21h | Hỗ trợ cài đặt hoàn toàn miễn phí</div>
                 </form>
 
                 <a class="header-action" href="<?php echo e(base_url('shop/orders.php')); ?>">
@@ -103,18 +103,18 @@ $metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, 
                     Theo doi don hang
                 </a>
                 <a class="cart-pill" href="<?php echo e(base_url('shop/cart.php')); ?>">
-                    <span>Gio hang /</span>
+                    <span>Giỏ hàng /</span>
                     <strong><?php echo money(cart_total()); ?></strong>
                     <i class="fa-solid fa-cart-shopping"></i>
                 </a>
             </div>
 
             <div class="codedoan-service-row">
-                <a class="category-trigger" href="#shop-sidebar"><i class="fa-solid fa-list"></i> Danh muc san pham</a>
+                <a class="category-trigger" href="#shop-sidebar"><i class="fa-solid fa-list"></i> Danh mục san pham</a>
                 <div class="service-mini"><span>100%</span><b>CODE PHONG PHU</b><em>Day du cac the loai...</em></div>
-                <div class="service-mini"><span>100%</span><b>CODE CHAT LUONG</b><em>Cam ket ho tro cai dat</em></div>
-                <div class="service-mini"><span>24h</span><b>HO TRO 24/24</b><em>Giao dich tu dong</em></div>
-                <div class="service-mini"><span><i class="fa-solid fa-shield-halved"></i></span><b>THANH TOAN</b><em>Thanh toan an toan bao mat</em></div>
+                <div class="service-mini"><span>100%</span><b>CODE CHẤT LƯỢNG</b><em>Cam kết hỗ trợ cài đặt</em></div>
+                <div class="service-mini"><span>24h</span><b>HO TRO 24/24</b><em>Giáo dich tu dong</em></div>
+                <div class="service-mini"><span><i class="fa-solid fa-shield-halved"></i></span><b>THANH TOAN</b><em>Thanh toán an toan bao mat</em></div>
             </div>
         </div>
     </div>
@@ -123,7 +123,7 @@ $metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, 
 <main class="codedoan-page">
     <div class="container">
         <div class="shop-breadcrumb">
-            <a href="<?php echo e(base_url('index.php')); ?>">Trang chu</a>
+            <a href="<?php echo e(base_url('index.php')); ?>">Trang chủ</a>
             <span>/</span>
             <a href="<?php echo e(base_url('index.php')); ?>">San pham</a>
             <span>/</span>
@@ -157,11 +157,11 @@ $metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, 
                     <form method="GET">
                         <input type="hidden" name="id" value="<?php echo (int) $categoryId; ?>">
                         <select name="sort" onchange="this.form.submit()">
-                            <option value="newest" <?php echo $sort === 'newest' ? 'selected' : ''; ?>>Sap xep theo moi nhat</option>
-                            <option value="popular" <?php echo $sort === 'popular' ? 'selected' : ''; ?>>Sap xep theo pho bien</option>
-                            <option value="price_asc" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>>Gia thap den cao</option>
-                            <option value="price_desc" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>>Gia cao den thap</option>
-                            <option value="rating" <?php echo $sort === 'rating' ? 'selected' : ''; ?>>Danh gia cao</option>
+                            <option value="newest" <?php echo $sort === 'newest' ? 'selected' : ''; ?>>Sắp xếp theo mới nhất</option>
+                            <option value="popular" <?php echo $sort === 'popular' ? 'selected' : ''; ?>>Sắp xếp theo pho bien</option>
+                            <option value="price_asc" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>>Giá thap den cao</option>
+                            <option value="price_desc" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>>Giá cao den thap</option>
+                            <option value="rating" <?php echo $sort === 'rating' ? 'selected' : ''; ?>>Đánh giá cao</option>
                         </select>
                     </form>
                 </div>
@@ -189,14 +189,14 @@ $metaDescription = 'Danh muc source code ' . $category['name'] . ' co gio hang, 
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="add">
                                 <input type="hidden" name="project_id" value="<?php echo (int) $row['id']; ?>">
-                                <button><i class="fa-solid fa-cart-plus"></i> Them vao gio</button>
+                                <button><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ</button>
                             </form>
                         </article>
                     <?php } ?>
                 </div>
 
                 <?php if (!$projects) { ?>
-                    <div class="codedoan-empty">Danh muc nay chua co san pham nao.</div>
+                    <div class="codedoan-empty">Danh mục này chưa có sản phẩm nào.</div>
                 <?php } ?>
 
                 <nav class="mt-4">

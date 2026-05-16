@@ -9,12 +9,45 @@ if (!$project) {
     die('Khong tim thay file.');
 }
 
-db_query('UPDATE projects SET downloads = downloads + 1 WHERE id = ?', [$id], 'i');
+if (!current_user()) {
+    flash('Vui long dang nhap de tai source.', 'warning');
+    redirect(base_url('auth/login.php'));
+}
+
+$isFree = (int) ($project['is_free'] ?? 0) === 1 || ((int) $project['price'] === 0 && (int) $project['sale_price'] === 0);
+$canDownload = $isFree || is_admin() || (current_user() && (int) current_user()['id'] === (int) $project['user_id']);
+
+if (!$canDownload && current_user()) {
+    $order = db_one(
+        "SELECT orders.id
+         FROM orders
+         JOIN order_items ON order_items.order_id = orders.id
+         WHERE orders.user_id = ?
+           AND order_items.project_id = ?
+           AND orders.status IN ('paid','completed')
+         LIMIT 1",
+        [current_user()['id'], $id],
+        'ii'
+    );
+    $canDownload = (bool) $order;
+}
+
+if (!$canDownload) {
+    flash('Source tra phi can mua va duoc admin xac nhan paid truoc khi tai.', 'warning');
+    redirect(base_url('projects/detail.php?id=' . $id));
+}
+
+db_query('UPDATE projects SET downloads = downloads + 1, downloads_count = downloads_count + 1 WHERE id = ?', [$id], 'i');
+db_query(
+    'INSERT INTO downloads(user_id, project_id, ip_address) VALUES(?, ?, ?)',
+    [(int) current_user()['id'], $id, $_SERVER['REMOTE_ADDR'] ?? 'CLI'],
+    'iis'
+);
 
 $file = dirname(__DIR__) . '/uploads/files/' . basename($project['source_file']);
 if (!is_file($file)) {
     http_response_code(404);
-    die('File khong ton tai.');
+    die('File không tồn tại.');
 }
 
 header('Content-Description: File Transfer');

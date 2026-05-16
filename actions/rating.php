@@ -15,5 +15,5 @@ if ($exists) {
     db_query('INSERT INTO ratings(project_id, user_id, star) VALUES(?, ?, ?)', [$projectId, $userId, $star], 'iii');
 }
 
-flash('Da luu danh gia cua ban.');
+flash('Đã lưu đánh giá của bạn.');
 redirect(base_url('projects/detail.php?id=' . $projectId));

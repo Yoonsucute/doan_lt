@@ -16,9 +16,9 @@ if ($action === 'add') {
     $project = db_one("SELECT id FROM projects WHERE id = ? AND status = 'approved'", [$projectId], 'i');
     if ($project) {
         $_SESSION['cart'][$projectId] = min(99, (int) ($_SESSION['cart'][$projectId] ?? 0) + 1);
-        flash('Da them vao gio hang.');
+        flash('Đã thêm vào giỏ hàng.');
     }
-    $redirectTo = $_POST['redirect_to'] ?? ($_SERVER['HTTP_REFERER'] ?? 'cart.php');
+    $redirectTo = $_POST['redirect_to'] ?? ($_SERVER['HTTP_REFERER'] ?? base_url('shop/cart.php'));
     redirect($redirectTo);
 }
 
@@ -32,20 +32,20 @@ if ($action === 'update') {
             $_SESSION['cart'][$projectId] = $qty;
         }
     }
-    flash('Da cap nhat gio hang.');
+    flash('Đã cập nhật giỏ hàng.');
     redirect(base_url('shop/cart.php'));
 }
 
 if ($action === 'remove') {
     $projectId = (int) ($_GET['project_id'] ?? 0);
     unset($_SESSION['cart'][$projectId]);
-    flash('Da xoa san pham khoi gio hang.');
+    flash('Đã xóa sản phẩm khỏi giỏ hàng.');
     redirect(base_url('shop/cart.php'));
 }
 
 if ($action === 'clear') {
     $_SESSION['cart'] = [];
-    flash('Da lam trong gio hang.');
+    flash('Đã làm trống giỏ hàng.');
     redirect(base_url('shop/cart.php'));
 }
 

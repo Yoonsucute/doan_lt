@@ -4,11 +4,11 @@
         <span class="small">Gemini/OpenAI ready</span>
     </div>
     <div class="chat-body" id="chat-box">
-        <div class="mb-2"><span class="badge text-bg-secondary">Xin chao, minh co the goi y source theo nhu cau cua ban.</span></div>
+        <div class="mb-2"><span class="badge text-bg-secondary">Xin chào, mình có thể gợi ý source theo nhu cầu của bạn.</span></div>
     </div>
     <div class="chat-footer">
         <div class="input-group">
-            <input type="text" id="message" class="form-control" placeholder="Nhap tin nhan...">
+            <input type="text" id="message" class="form-control" placeholder="Nhập tin nhắn...">
             <button onclick="sendMessage()" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>

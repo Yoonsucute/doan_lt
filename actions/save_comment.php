@@ -7,7 +7,7 @@ $projectId = (int) ($_POST['project_id'] ?? 0);
 $content = trim($_POST['content'] ?? '');
 
 if ($projectId <= 0 || $content === '') {
-    flash('Binh luan khong hop le.', 'danger');
+    flash('Bình luận không hợp lệ.', 'danger');
     redirect(base_url('index.php'));
 }
 
@@ -26,5 +26,5 @@ if ($owner && (int) $owner['user_id'] !== (int) current_user()['id']) {
     );
 }
 
-flash('Da gui binh luan.');
+flash('Đã gửi bình luận.');
 redirect(base_url('projects/detail.php?id=' . $projectId));

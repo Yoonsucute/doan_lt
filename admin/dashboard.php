@@ -5,10 +5,11 @@ require_admin();
 $totalUsers = (int) (db_one('SELECT COUNT(*) AS total FROM users')['total'] ?? 0);
 $totalProjects = (int) (db_one('SELECT COUNT(*) AS total FROM projects')['total'] ?? 0);
 $totalComments = (int) (db_one('SELECT COUNT(*) AS total FROM comments')['total'] ?? 0);
-$totalDownloads = (int) (db_one('SELECT COALESCE(SUM(downloads), 0) AS total FROM projects')['total'] ?? 0);
+$totalDownloads = (int) (db_one('SELECT COALESCE(SUM(downloads_count), SUM(downloads), 0) AS total FROM projects')['total'] ?? 0);
 $pending = (int) (db_one("SELECT COUNT(*) AS total FROM projects WHERE status = 'pending'")['total'] ?? 0);
 $reports = (int) (db_one("SELECT COUNT(*) AS total FROM reports WHERE status = 'open'")['total'] ?? 0);
 $ordersCount = (int) (db_one('SELECT COUNT(*) AS total FROM orders')['total'] ?? 0);
+$revenue = (int) (db_one("SELECT COALESCE(SUM(total), 0) AS total FROM orders WHERE status IN ('paid','completed')")['total'] ?? 0);
 $monthly = db_all("SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS total FROM projects GROUP BY month ORDER BY month DESC LIMIT 6");
 ?>
 <!DOCTYPE html>
@@ -26,10 +27,13 @@ $monthly = db_all("SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS
     <aside class="admin-sidebar p-4" style="width:260px;">
         <h3 class="text-white mb-4">ADMIN</h3>
         <a class="d-block mb-3" href="dashboard.php"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-        <a class="d-block mb-3" href="projects.php"><i class="fa-solid fa-folder"></i> Quan ly do an</a>
-        <a class="d-block mb-3" href="orders.php"><i class="fa-solid fa-cart-shopping"></i> Quan ly don hang</a>
-        <a class="d-block mb-3" href="users.php"><i class="fa-solid fa-users"></i> Quan ly user</a>
-        <a class="d-block text-danger" href="../logout.php">Dang xuat</a>
+        <a class="d-block mb-3" href="projects.php"><i class="fa-solid fa-folder"></i> Quản lý đồ án</a>
+        <a class="d-block mb-3" href="categories.php"><i class="fa-solid fa-layer-group"></i> Quản lý danh mục</a>
+        <a class="d-block mb-3" href="orders.php"><i class="fa-solid fa-cart-shopping"></i> Quản lý đơn hàng</a>
+        <a class="d-block mb-3" href="comments.php"><i class="fa-solid fa-comments"></i> Quản lý bình luận</a>
+        <a class="d-block mb-3" href="reports.php"><i class="fa-solid fa-flag"></i> Quản lý báo cáo</a>
+        <a class="d-block mb-3" href="users.php"><i class="fa-solid fa-users"></i> Quản lý user</a>
+        <a class="d-block text-danger" href="../auth/logout.php">Đăng xuất</a>
     </aside>
     <main class="flex-grow-1 p-4">
         <h2 class="mb-4">Dashboard</h2>
@@ -37,11 +41,12 @@ $monthly = db_all("SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS
             <?php foreach ([
                 ['User', $totalUsers, 'users'],
                 ['Do an', $totalProjects, 'folder'],
-                ['Binh luan', $totalComments, 'comments'],
+                ['Bình luận', $totalComments, 'comments'],
                 ['Download', $totalDownloads, 'download'],
-                ['Cho duyet', $pending, 'clock'],
-                ['Report mo', $reports, 'flag'],
-                ['Don hang', $ordersCount, 'cart-shopping'],
+                ['Chờ duyệt', $pending, 'clock'],
+                ['Báo cáo mở', $reports, 'flag'],
+                ['Đơn hàng', $ordersCount, 'cart-shopping'],
+                ['Doanh thu', $revenue, 'sack-dollar'],
             ] as $stat) { ?>
                 <div class="col-md-4 col-xl-2 mb-4">
                     <div class="card p-3">
@@ -52,7 +57,7 @@ $monthly = db_all("SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS
             <?php } ?>
         </div>
         <div class="card p-4">
-            <h5>Thong ke bai dang theo thang</h5>
+            <h5>Thống kê bài đăng theo tháng</h5>
             <canvas id="projectChart" height="95"></canvas>
         </div>
     </main>

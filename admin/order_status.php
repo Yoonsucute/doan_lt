@@ -5,7 +5,7 @@ verify_csrf();
 
 $id = (int) ($_POST['id'] ?? 0);
 $status = $_POST['status'] ?? 'pending';
-$allowed = ['pending', 'completed', 'cancelled'];
+$allowed = ['pending', 'paid', 'completed', 'cancelled'];
 if (!in_array($status, $allowed, true)) {
     $status = 'pending';
 }
@@ -15,10 +15,10 @@ if ($order) {
     db_query('UPDATE orders SET status = ? WHERE id = ?', [$status, $id], 'si');
     db_query(
         'INSERT INTO notifications(user_id, message, link) VALUES(?, ?, ?)',
-        [(int) $order['user_id'], 'Don hang #' . $id . ' da cap nhat trang thai: ' . $status, 'orders.php'],
+        [(int) $order['user_id'], 'Đơn hàng #' . $id . ' da cap nhat trang thai: ' . $status, 'orders.php'],
         'iss'
     );
-    flash('Da cap nhat don hang.');
+    flash('Đã cập nhật đơn hàng.');
 }
 
 redirect('orders.php');
