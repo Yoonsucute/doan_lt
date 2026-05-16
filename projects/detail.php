@@ -48,6 +48,40 @@ $pageTitle = $project['title'];
 $metaTitle = $project['meta_title'] ?: $project['title'];
 $plainDescription = strip_tags($project['short_description'] ?: $project['description']);
 $metaDescription = function_exists('mb_substr') ? mb_substr($plainDescription, 0, 155) : substr($plainDescription, 0, 155);
+
+function video_embed_url(?string $url): string
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return '';
+    }
+
+    $parts = parse_url($url);
+    $host = strtolower($parts['host'] ?? '');
+    $path = $parts['path'] ?? '';
+
+    if (str_contains($host, 'youtube.com')) {
+        parse_str($parts['query'] ?? '', $query);
+        if (!empty($query['v'])) {
+            return 'https://www.youtube.com/embed/' . rawurlencode($query['v']);
+        }
+        if (str_starts_with($path, '/embed/')) {
+            return $url;
+        }
+        if (str_starts_with($path, '/shorts/')) {
+            return 'https://www.youtube.com/embed/' . rawurlencode(basename($path));
+        }
+    }
+
+    if (str_contains($host, 'youtu.be')) {
+        return 'https://www.youtube.com/embed/' . rawurlencode(trim($path, '/'));
+    }
+
+    return $url;
+}
+
+$videoDemo = video_embed_url($project['video_demo'] ?? '');
+$isVideoFile = $videoDemo !== '' && preg_match('/\.(mp4|webm|ogg)(\?.*)?$/i', $videoDemo);
 ?>
 <?php include dirname(__DIR__) . '/includes/header.php'; ?>
 <?php include dirname(__DIR__) . '/includes/navbar.php'; ?>
@@ -123,6 +157,7 @@ $metaDescription = function_exists('mb_substr') ? mb_substr($plainDescription, 0
             <ul class="nav nav-pills mb-4" role="tablist">
                 <?php foreach ([
                     'desc' => 'Mô tả',
+                    'video' => 'Video demo',
                     'features' => 'Chức năng',
                     'tech' => 'Công nghệ',
                     'install' => 'Hướng dẫn cài đặt',
@@ -137,6 +172,24 @@ $metaDescription = function_exists('mb_substr') ? mb_substr($plainDescription, 0
                     <h3>Mô tả source</h3>
                     <p><?php echo nl2br(e($project['description'])); ?></p>
                     <p><a href="<?php echo e(base_url('projects/demo.php?id=' . (int) $project['id'])); ?>">Xem demo nội bộ của CodeDoAn</a></p>
+                </div>
+                <div class="tab-pane fade" id="tab-video">
+                    <h3>Video demo</h3>
+                    <?php if ($videoDemo !== '') { ?>
+                        <div class="video-demo-frame">
+                            <?php if ($isVideoFile) { ?>
+                                <video src="<?php echo e($videoDemo); ?>" controls preload="metadata"></video>
+                            <?php } else { ?>
+                                <iframe src="<?php echo e($videoDemo); ?>" title="Video demo <?php echo e($project['title']); ?>" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <?php } ?>
+                        </div>
+                    <?php } else { ?>
+                        <div class="video-demo-empty">
+                            <i class="fa-solid fa-video"></i>
+                            <span>Source nay chua co link video demo. Ban van co the xem demo noi bo ben duoi.</span>
+                            <a class="btn btn-outline-primary" href="<?php echo e(base_url('projects/demo.php?id=' . (int) $project['id'])); ?>">Xem demo noi bo</a>
+                        </div>
+                    <?php } ?>
                 </div>
                 <div class="tab-pane fade" id="tab-features">
                     <h3>Chức năng chinh</h3>

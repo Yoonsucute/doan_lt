@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg sticky-top app-navbar">
-    <div class="container">
+    <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold" href="<?php echo e(base_url('index.php')); ?>">
             <i class="fa-solid fa-code"></i> CodeDoAn
         </a>
@@ -32,13 +32,30 @@
                     <?php if (is_admin()) { ?>
                         <li class="nav-item"><a class="nav-link" href="<?php echo e(base_url('admin/dashboard.php')); ?>">Admin</a></li>
                     <?php } ?>
-                    <li class="nav-item">
-                        <button class="nav-link theme-toggle" type="button" id="themeToggle" title="Dark mode">
-                            <i class="fa-solid fa-moon"></i>
+                    <?php
+                    $user = current_user();
+                    $avatar = $user['avatar'] ?? '';
+                    $avatarPath = dirname(__DIR__) . '/uploads/avatars/' . $avatar;
+                    $avatarUrl = ($avatar && $avatar !== 'default.png' && is_file($avatarPath))
+                        ? base_url('uploads/avatars/' . $avatar)
+                        : base_url('assets/images/default-avatar.svg');
+                    ?>
+                    <li class="nav-item dropdown">
+                        <button class="nav-link account-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img class="account-avatar" src="<?php echo e($avatarUrl); ?>" alt="<?php echo e($user['name']); ?>">
+                            <span class="account-name"><?php echo e($user['name']); ?></span>
                         </button>
+                        <ul class="dropdown-menu dropdown-menu-end account-menu">
+                            <li><a class="dropdown-item" href="<?php echo e(base_url('auth/profile.php')); ?>"><i class="fa-solid fa-user-pen"></i> Hồ sơ cá nhân</a></li>
+                            <li>
+                                <button class="dropdown-item theme-toggle" type="button" id="themeToggle">
+                                    <i class="fa-solid fa-moon"></i> Dark mode
+                                </button>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="<?php echo e(base_url('auth/logout.php')); ?>"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo e(base_url('auth/profile.php')); ?>"><?php echo e($_SESSION['user']['name']); ?></a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="<?php echo e(base_url('auth/logout.php')); ?>">Đăng xuất</a></li>
                 <?php } else { ?>
                     <li class="nav-item">
                         <button class="nav-link theme-toggle" type="button" id="themeToggle" title="Dark mode">

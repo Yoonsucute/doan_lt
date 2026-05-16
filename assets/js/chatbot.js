@@ -28,6 +28,41 @@ function sendMessage() {
     });
 }
 
+function setChatOpen(isOpen) {
+    const widget = $('#chat-widget');
+    const toggle = $('#chat-toggle');
+    const close = $('#chat-close');
+
+    widget.toggleClass('is-collapsed', !isOpen);
+    toggle.attr('aria-expanded', isOpen ? 'true' : 'false');
+    close.attr('aria-label', isOpen ? 'Dong chat' : 'Mo chat');
+    localStorage.setItem('chatWidgetOpen', isOpen ? '1' : '0');
+
+    if (isOpen) {
+        $('.chat-body').scrollTop($('.chat-body')[0].scrollHeight);
+        setTimeout(function () {
+            $('#message').trigger('focus');
+        }, 120);
+    }
+}
+
+$(function () {
+    setChatOpen(localStorage.getItem('chatWidgetOpen') !== '0');
+});
+
+$(document).on('click', '#chat-close', function () {
+    const isCollapsed = $('#chat-widget').hasClass('is-collapsed');
+    setChatOpen(isCollapsed);
+});
+
+$(document).on('click', '#chat-toggle', function () {
+    const isCollapsed = $('#chat-widget').hasClass('is-collapsed');
+
+    if (isCollapsed) {
+        setChatOpen(true);
+    }
+});
+
 $(document).on('keydown', '#message', function (e) {
     if (e.key === 'Enter') sendMessage();
 });
